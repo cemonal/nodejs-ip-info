@@ -23,48 +23,62 @@ const requestOptions = { headers: headers, httpsAgent: httpsAgent };
 const requestIp = require('request-ip');
 app.use(requestIp.mw());
 
+// Create a cache for storing IP information with a TTL of 1 hour.
+const myIpCache = new NodeCache({ stdTTL: 60 * 60 });
+
 // Create a cache using NodeCache for the 'mycountrycode' endpoint.
-const myCountryCache = new NodeCache({ stdTTL: 60 }); // Cache mycountry info for 60 seconds.
+const myCountryCache = new NodeCache({ stdTTL: 60 * 60 });
 
 // Create a cache using NodeCache for common country info.
-const commonCountryCache = new NodeCache({ stdTTL: 60 }); // Cache common country info for 60 seconds.
+const commonCountryCache = new NodeCache({ stdTTL: 60 * 60 });
 
+/**
+ * Function to fetch the country code based on the IP address.
+ * @param {string} ipAddress - The IP address to fetch the country code for.
+ * @returns {Promise<string|null>} - A Promise that resolves to the country code or null if not found.
+ */
 async function getCountryCode(ipAddress) {
-  // Check the cache for the IP address.
-  const cachedCountry = myCountryCache.get(ipAddress);
+  try {
+    // Check the cache for the IP address.
+    const cachedCountry = myCountryCache.get(ipAddress);
 
-  if (cachedCountry) {
-    return cachedCountry;
-  } else {
-    if (isLocalIp(ipAddress)) {
-      // If the IP is local, return a custom response and cache it.
-      const localeData = 'Locale';
-      myCountryCache.set(ipAddress, localeData);
-      return localeData;
+    if (cachedCountry) {
+      return cachedCountry;
     } else {
-      // If the IP is not local, fetch the country code using an external API and cache it.
-      const response = await axios.get(`https://ipapi.co/${ipAddress}/country`, requestOptions);
+      // First, try to fetch city info from https://ipapi.co
+      const ipapiResponse = await axios.get(`https://ipapi.co/${ipAddress}/country`, requestOptions);
 
-      if (!response.data) {
-        throw new Error('Invalid response from the country API');
+      if (ipapiResponse.status === 200 && ipapiResponse.data) {
+        // Cache the city info.
+        myCountryCache.set(ipAddress, ipapiResponse.data);
+        return ipapiResponse.data;
       }
 
-      const countryCode = response.data;
-      myCountryCache.set(ipAddress, countryCode);
+      // If ipapi.co request fails, try to fetch city info from https://ipinfo.io
+      const ipinfoResponse = await axios.get(`https://ipinfo.io/${ipAddress}/country`, requestOptions);
 
-      return countryCode;
+      if (ipinfoResponse.status === 200 && ipinfoResponse.data) {
+        // Cache the city info.
+        myCountryCache.set(ipAddress, ipinfoResponse.data);
+        return ipinfoResponse.data;
+      }
+
+      // If both requests fail, return null
+      return null;
     }
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 }
 
-// Function to retrieve country information based on the alpha code.
+/**
+ * Function to retrieve country information based on the alpha code.
+ * @param {string} alphaCode - The alpha code of the country to fetch information for.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the country information object or null if not found.
+ */
 async function getCountryInfo(alphaCode) {
   try {
-    // Check if the alpha code is 'Locale' (for local IP).
-    if (alphaCode === 'Locale') {
-      return null;
-    }
-
     // Check if the alpha code is exactly 2 characters long.
     if (alphaCode.length !== 2) {
       throw new Error('Invalid country code. Country code should be exactly 2 characters.');
@@ -96,7 +110,11 @@ async function getCountryInfo(alphaCode) {
   }
 }
 
-// Function to retrieve the client's IP address.
+/**
+ * Function to retrieve the client's IP address.
+ * @param {Object} req - The Express.js request object.
+ * @returns {Promise<string>} - A Promise that resolves to the client's IP address.
+ */
 async function getClientIp(req) {
   if (req.headers['x-forwarded-for']) {
     const useReverseProxy = req.query.reverseProxy === 'true';
@@ -122,7 +140,11 @@ async function getClientIp(req) {
   }
 }
 
-// Function to determine if an IP address is local (localhost or a connected local network).
+/**
+ * Function to determine if an IP address is local (localhost or a connected local network).
+ * @param {string} ipAddress - The IP address to check.
+ * @returns {boolean} - Returns true if the IP is local, otherwise false.
+ */
 function isLocalIp(ipAddress) {
   if (
     ipAddress === '127.0.0.1' ||
@@ -141,6 +163,56 @@ function isLocalIp(ipAddress) {
   return false;
 }
 
+/**
+ * Function to fetch IP information including city, region, country, postal, timezone, and org.
+ * @param {string} ipAddress - The IP address to fetch information for.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the IP information object or null if not found.
+ */
+async function getIpInfo(ipAddress) {
+  try {
+    // Check the cache for the IP address.
+    const cachedIp = myIpCache.get(ipAddress);
+
+    if (cachedIp) {
+      return cachedIp;
+    }
+
+    // First, try to fetch IP info from https://ipinfo.io
+    const ipinfoResponse = await axios.get(`https://ipinfo.io/${ipAddress}/json`, requestOptions);
+    let data;
+
+    if (ipinfoResponse.status === 200 && ipinfoResponse.data) {
+      // Cache the IP info.
+      data = ipinfoResponse.data;
+    }
+
+    // If ipinfo.io request fails, try to fetch IP info from https://ipapi.co
+    const ipapiResponse = await axios.get(`https://ipapi.co/${ipAddress}/json`, requestOptions);
+
+    if (ipapiResponse.status === 200 && ipapiResponse.data) {
+      // Cache the IP info.
+      data = ipapiResponse.data;
+    }
+	
+	const response = {
+      ip: ipAddress,
+      city: data.city,
+      region: data.region,
+      country: data.country,
+      postal: data.postal,
+      timezone: data.timezone,
+      org: data.org
+    };
+
+    myIpCache.set(ipAddress, response);
+
+    return response;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 // Endpoint to retrieve the client's country code.
 app.get('/mycountrycode', async (req, res) => {
   try {
@@ -154,7 +226,7 @@ app.get('/mycountrycode', async (req, res) => {
 });
 
 // Endpoint to retrieve the client's country info.
-app.get('/mycountryinfo', async (req, res) => {
+app.get('/mycountry', async (req, res) => {
   try {
     const ipAddress = await getClientIp(req);
     const countryCode = await getCountryCode(ipAddress);
@@ -181,14 +253,9 @@ app.get('/myip', async (req, res) => {
 app.get('/mydetails', async (req, res) => {
   try {
     const ipAddress = await getClientIp(req);
-    const countryCode = await getCountryCode(ipAddress);
-    const countryInfo = await getCountryInfo(countryCode);
+    const response = await getIpInfo(ipAddress);
 
-    res.json({
-      ip: ipAddress,
-      countryCode: countryCode,
-      countryInfo: countryInfo
-    });
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
