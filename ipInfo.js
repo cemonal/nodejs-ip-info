@@ -29,6 +29,34 @@ const myCountryCache = new NodeCache({ stdTTL: 60 }); // Cache mycountry info fo
 // Create a cache using NodeCache for common country info.
 const commonCountryCache = new NodeCache({ stdTTL: 60 }); // Cache common country info for 60 seconds.
 
+async function getCountryCode(ipAddress) {
+  // Check the cache for the IP address.
+  const cachedCountry = myCountryCache.get(ipAddress);
+
+  if (cachedCountry) {
+    return cachedCountry;
+  } else {
+    if (isLocalIp(ipAddress)) {
+      // If the IP is local, return a custom response and cache it.
+      const localeData = 'Locale';
+      myCountryCache.set(ipAddress, localeData);
+      return localeData;
+    } else {
+      // If the IP is not local, fetch the country code using an external API and cache it.
+      const response = await axios.get(`https://ipapi.co/${ipAddress}/country`, requestOptions);
+
+      if (!response.data) {
+        throw new Error('Invalid response from the country API');
+      }
+
+      const countryCode = response.data;
+      myCountryCache.set(ipAddress, countryCode);
+
+      return countryCode;
+    }
+  }
+}
+
 // Function to retrieve country information based on the alpha code.
 async function getCountryInfo(alphaCode) {
   try {
