@@ -1,11 +1,16 @@
-# Node.js IP Info
+# Node.js IP Info API
 
-Node.js IP Info is a simple REST API server that provides information about IP addresses, including the country code, public IP address, and country information. It also supports caching to minimize external API requests.
+Node.js IP Info API is a simple RESTful service that provides information about IP addresses, including the country code, public IP address, and country information. It also supports caching to minimize external API requests.
 
 ## Table of Contents
 
 - [Usage](#usage)
 - [Endpoints](#endpoints)
+  - [Get Client's Country Code](#get-clients-country-code)
+  - [Get Client's Country Info](#get-clients-country-info)
+  - [Get Client's Public IP Address](#get-clients-public-ip-address)
+  - [Get IP Details](#get-ip-details)
+  - [Get Country Information by Alpha Code](#get-country-information-by-alpha-code)
 - [Project Structure](#project-structure)
 - [Dependencies](#dependencies)
 - [How to Contribute](#how-to-contribute)
@@ -35,25 +40,45 @@ The server will be running on `http://localhost:3000` by default.
 
 ## Endpoints
 
-- **GET /mycountrycode**
-  - Description: Retrieves the country code based on the client's IP address.
-  - Example: `http://localhost:3000/mycountrycode`
+### Get Client's Country Code
 
-- **GET /mycountryinfo**
-  - Description: Retrieves detailed country information based on the client's IP address.
-  - Example: `http://localhost:3000/mycountryinfo`
+- **Description:** Retrieves the country code based on the client's IP address.
 
-- **GET /myip**
-  - Description: Retrieves the public IP address of the client.
-  - Example: `http://localhost:3000/myip`
+- **Endpoint:** `/mycountrycode`
 
-- **GET /mydetails**
-  - Description: Retrieves IP details, including country code and country information, based on the client's IP address.
-  - Example: `http://localhost:3000/mydetails`
+- **Example:** `http://localhost:3000/mycountrycode`
 
-- **GET /country/:alphaCode**
-  - Description: Retrieves country information by alpha code (e.g., "TR" for Turkey).
-  - Example: `http://localhost:3000/country/TR`
+### Get Client's Country Info
+
+- **Description:** Retrieves detailed country information based on the client's IP address.
+
+- **Endpoint:** `/mycountry`
+
+- **Example:** `http://localhost:3000/mycountry`
+
+### Get Client's Public IP Address
+
+- **Description:** Retrieves the public IP address of the client.
+
+- **Endpoint:** `/myip`
+
+- **Example:** `http://localhost:3000/myip`
+
+### Get IP Details
+
+- **Description:** Retrieves IP details, including city, region, country, postal code, timezone, and organization, based on the client's IP address.
+
+- **Endpoint:** `/mydetails`
+
+- **Example:** `http://localhost:3000/mydetails`
+
+### Get Country Information by Alpha Code
+
+- **Description:** Retrieves country information by alpha code (e.g., "TR" for Turkey).
+
+- **Endpoint:** `/country/:alphaCode`
+
+- **Example:** `http://localhost:3000/country/TR`
 
 ## Project Structure
 
