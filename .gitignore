@@ -1,0 +1,7 @@
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore other temporary files or folders
+*.log
+*.tmp
+.DS_Store

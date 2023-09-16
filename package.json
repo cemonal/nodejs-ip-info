@@ -1,15 +1,17 @@
 {
   "name": "nodejs-ip-info",
   "version": "1.0.0",
-  "description": "A Node.js application to fetch IP information including country code and public IP address.",
+  "description": "A Node.js application to fetch IP information.",
   "dependencies": {
     "axios": "^0.21.1",
     "express": "^4.17.1",
-    "https": "^1.0.0",
-    "node-cache": "^5.1.2",
-    "request-ip": "^2.1.2"
+    "express-rate-limit": "^7.0.0",
+    "request-ip": "^2.1.2",
+    "winston": "^3.10.0"
   },
   "scripts": {
+    "dev": "nodemon ipInfo.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ipInfo.js"
   },
   "keywords": [
@@ -17,13 +19,14 @@
     "expressjs",
     "ip-address",
     "ip-information",
-    "axios",
-    "caching",
-    "web-development"
+    "axios"
   ],
-  "author": "Cem Önal",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cemonal/nodejs-ip-info"
+    "url": "git+https://github.com/cemonal/nodejs-ip-info.git"
+  },
+  "author": "Cem Önal",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
