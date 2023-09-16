@@ -1,125 +1,96 @@
-# Node.js IP Info API
+# Node.js IP Information API
 
-Node.js IP Info API is a simple RESTful service that provides information about IP addresses, including the country code, public IP address, and country information. It also supports caching to minimize external API requests.
+This is a Node.js application that provides IP information, including the public IP address of the client. It allows you to retrieve details such as the city, region, country, postal code, timezone, and organization associated with an IP address.
 
 ## Table of Contents
 
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
 - [Usage](#usage)
+- [Configuration](#configuration)
 - [Endpoints](#endpoints)
-  - [Get Client's Country Code](#get-clients-country-code)
-  - [Get Client's Country Info](#get-clients-country-info)
-  - [Get Client's Public IP Address](#get-clients-public-ip-address)
-  - [Get IP Details](#get-ip-details)
-  - [Get Country Information by Alpha Code](#get-country-information-by-alpha-code)
-- [Project Structure](#project-structure)
-- [Dependencies](#dependencies)
-- [How to Contribute](#how-to-contribute)
+- [Rate Limiting](#rate-limiting)
+- [Error Handling](#error-handling)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Getting Started
+
+### Prerequisites
+
+Before running this application, make sure you have the following prerequisites installed on your system:
+
+- Node.js: [Download and Install Node.js](https://nodejs.org/)
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/cemonal/nodejs-ip-info.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd nodejs-ip-info
+   ```
+
+3. Install the dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Start the application:
+
+   ```bash
+   npm start
+   ```
+
+The server will be running on port **3000** by default. You can configure the port and other settings in the `config.js` file.
 
 ## Usage
 
-1. Clone this repository:
+To use the API, simply make GET requests to the appropriate endpoints. The main endpoint for retrieving the client's public IP address is:
 
-```shell
-git clone https://github.com/cemonal/nodejs-ip-info.git
-```
+   ```bash
+   GET /
+   ```
 
-2. Install dependencies:
+You can replace the base URL with your server's address if needed.
 
-```shell
-cd nodejs-ip-info
-npm install
-```
+## Configuration
 
-3. Start the server:
+You can configure the application settings in the `config.js` file. Here are the available configuration options:
 
-```shell
-npm start
-```
-
-The server will be running on `http://localhost:3000` by default.
+- `rateLimit`: Configure rate limiting settings, such as the time window and maximum number of requests allowed.
+- `port`: Configure the port on which the server will listen.
 
 ## Endpoints
 
-### Get Client's Country Code
+This application exposes the following endpoint:
 
-- **Description:** Retrieves the country code based on the client's IP address.
+- `/`: This endpoint retrieves the public IP address of the client.
 
-- **Endpoint:** `/mycountrycode`
+## Rate Limiting
 
-- **Example:** `http://localhost:3000/mycountrycode`
+To prevent abuse of the API, rate limiting is applied. The default rate limiting settings are defined in the configuration file, but you can customize them to suit your needs.
 
-### Get Client's Country Info
+## Error Handling
 
-- **Description:** Retrieves detailed country information based on the client's IP address.
+Global error handling is implemented to ensure that errors are logged and provide feedback to clients in case of unexpected errors. The error handling middleware logs errors and responds with an error message.
 
-- **Endpoint:** `/mycountry`
+## Contributing
 
-- **Example:** `http://localhost:3000/mycountry`
-
-### Get Client's Public IP Address
-
-- **Description:** Retrieves the public IP address of the client.
-
-- **Endpoint:** `/myip`
-
-- **Example:** `http://localhost:3000/myip`
-
-### Get IP Details
-
-- **Description:** Retrieves IP details, including city, region, country, postal code, timezone, and organization, based on the client's IP address.
-
-- **Endpoint:** `/mydetails`
-
-- **Example:** `http://localhost:3000/mydetails`
-
-### Get Country Information by Alpha Code
-
-- **Description:** Retrieves country information by alpha code (e.g., "TR" for Turkey).
-
-- **Endpoint:** `/country/:alphaCode`
-
-- **Example:** `http://localhost:3000/country/TR`
-
-## Project Structure
-
-The project has the following structure:
-
-```go
-nodejs-ip-info/
-├── ipInfo.js
-├── node_modules/
-├── package.json
-├── package-lock.json
-├── README.md
-└── .gitignore
-```
-
-- **ipInfo.js:** The main application file that contains the Node.js code.
-- **node_modules/:** The directory where project dependencies are installed.
-- **package.json:** Configuration file that lists project dependencies and scripts.
-- **package-lock.json:** An automatically generated file to lock dependencies to specific versions.
-- **README.md:** This file, which provides detailed information about the project, how to use it, and other relevant details.
-- **.gitignore:** Configuration file specifying files and directories to be ignored by Git.
-
-## Dependencies
-
-The project uses the following dependencies:
-
-- [Express](https://expressjs.com/): A fast, unopinionated, minimalist web framework for Node.js.
-- [Axios](https://axios-http.com/): A promise-based HTTP client for the browser and Node.js.
-- [Node-cache](https://www.npmjs.com/package/node-cache): A simple in-memory cache for Node.js.
-- [Request-ip](https://www.npmjs.com/package/request-ip): A middleware for extracting a user's IP address in Express.js.
-
-## How to Contribute
-
-Contributions to this project are welcome! Here's how you can contribute:
+Contributions to this project are welcome! If you'd like to contribute, please follow these steps:
 
 1. Fork the repository.
-2. Clone the forked repository to your local machine.
-3. Create a new branch for your feature or bugfix: `git checkout -b feature-name`.
-4. Make your changes and commit them with descriptive messages.
-5. Push your changes to your fork: `git push origin feature-name`.
-6. Create a pull request on the original repository.
-7. Wait for the maintainers to review your pull request.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and test thoroughly.
+4. Commit your changes with clear and concise commit messages.
+5. Push your changes to your forked repository.
+6. Create a pull request to the original repository, explaining your changes and the problem they solve.
 
-Please ensure that your contributions align with the project's goals and follow best practices.
+Thank you for contributing!
