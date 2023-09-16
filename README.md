@@ -1,6 +1,6 @@
 # Node.js IP Information API
 
-This is a Node.js application that provides IP information, including the public IP address of the client. It allows you to retrieve details such as the city, region, country, postal code, timezone, and organization associated with an IP address.
+This is a Node.js application that retrieves the public IP address of the client.
 
 ## Table of Contents
 
