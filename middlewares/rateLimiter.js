@@ -6,7 +6,7 @@ function configure(app) {
   // Load rate limit configuration from the config file
   const rateLimitConfig = config.rateLimit;
 
-  if (rateLimitConfig) {
+  if (rateLimitConfig && rateLimitConfig.active) {
     // Apply rate limiting middleware if configured
     const limiter = rateLimit({
       windowMs: rateLimitConfig.windowMs || 15 * 60 * 1000,

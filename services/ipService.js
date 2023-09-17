@@ -2,10 +2,6 @@ const axios = require('axios');
 // Use the 'request-ip' library middleware to easily retrieve client IP addresses.
 const requestIp = require('request-ip');
 
-function configure(app) {
-    app.use(requestIp.mw());
-}
-
 async function getClientIp(req) {
     let ipAddress = requestIp.getClientIp(req);
 
@@ -50,6 +46,6 @@ function isLocalIp(ipAddress) {
 }
 
 module.exports = {
-    configure,
+    requestIp,
     getClientIp
 };

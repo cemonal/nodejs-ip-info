@@ -3,14 +3,16 @@ const express = require('express');
 const logger = require('./utils/logger');
 const config = require('./config');
 const port = process.env.PORT || (config.port || 3000);
-const ipService = require('./services/ipService');
+const { requestIp, getClientIp } = require('./services/ipService');
 const rateLimiter = require('./middlewares/rateLimiter');
+const timingMiddleware = require('./middlewares/timingMiddleware');
 
 // Create an Express.js application.
 const app = express();
 
+app.use(requestIp.mw());
 rateLimiter.configure(app);
-ipService.configure(app);
+app.use(timingMiddleware);
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -20,7 +22,7 @@ if (environment === "development")
 
 // Endpoint to retrieve the public IP address of the client.
 app.get('/', async (req, res) => {
-  const ipAddress = await ipService.getClientIp(req);
+  const ipAddress = await getClientIp(req);
   res.send(ipAddress);
 });
 
